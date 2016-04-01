@@ -4,7 +4,7 @@ $www_root = dirname( dirname( __DIR__ ) ) . '/www';
 
 $actions = array(
     "delete" => array(
-        "wp/wp-config-sample.php",
+        "wp/wp-defaults-sample.php",
         "wp/readme.html",
     ),
     "overwrite" => array(

@@ -1,22 +1,21 @@
 <?php
 
 
-$config = new WPLib_CLI\Config();
-$config->load();
+$project = new WPLib_CLI\Project();
 
 $php_open_tag= '<' . '?php';
 $json=<<<JSON
 {
-    "name": "{$config->organization}/{$config->project_slug}",
-    "description": "{$config->description}",
-    "license": "{$config->license}",
+    "name": "{$project->repo_org}/{$project->project_slug}",
+    "description": "{$project->description}",
+    "license": "{$project->license}",
     "type": "project",
     "authors": [
         {
-            "name": "A fan of WPLib",
-            "email": "fan@wplib.org",
-            "homepage": "http://wplib.org",
-            "role": "WPLib-based Website Project Developer Library Author"
+            "name": "{$project->author_name}",
+            "email": "{$project->author_email}",
+            "homepage": "{$project->author_homepage}",
+            "role": "{$project->author_role}",
         }
     ],
     "repositories": [
@@ -42,10 +41,10 @@ $json=<<<JSON
     },
     "extra": {
         "wplib" : {
-            "name": "{$config->project_name}",
-            "prefix": "{$config->project_prefix}",
+            "name": "{$project->project_name}",
+            "prefix": "{$project->project_prefix}",
             "comments": "'app' can start with '~' (local file), 'http' (remote file), '{' (object), or have a single slash meaning it comes from 'require'",
-            "app": "~/www/content/mu-plugins/{$config->app_slug}",
+            "app": "~/www/content/mu-plugins/{$project->app_slug}",
             "theme": {}
         },
         "wordpress-install-dir": "www/wp",
@@ -66,7 +65,7 @@ $json=<<<JSON
             ]
         }
     },
-    "config": {
+    "defaults": {
         "vendor-dir": "www/content/vendor"
     },
     "scripts": {

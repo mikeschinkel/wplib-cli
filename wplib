@@ -30,28 +30,13 @@ VERSION="0.1"
 project_slug=""
 app_slug=""
 
-set_config_var() {
-    if [ "" == "$1" ]; then
-        echo
-        echo "No config var specified."
-        echo
-        echo "   Usage: ${PROGNAME} set <config_var>=<config_value>"
-        echo
-        exit
-    fi
-    config_var="$1"
+set_defaults_var() {
 
-    if [ "" == "$2" ]; then
-        echo
-        echo "No config value specified."
-        echo
-        echo "   Usage: ${PROGNAME} set <config_var>=<config_value>"
-        echo
-        exit
-    fi
-    config_value="$2"
+    defaults_var="$1"
+    defaults_value="$2"
+    $php_bin -n -f "${script_dir}/inc/set-defaults-var.php" ${defaults_var}="${defaults_value}"
+    graceful_exit
 
-    $php_bin "${script_dir}/inc/set-config-var.php" "${config_var}" "${config_value}"
 
 }
 init_project() {  #Initializing WPLib-based WordPress website project
@@ -62,7 +47,7 @@ init_project() {  #Initializing WPLib-based WordPress website project
         echo
         echo "   Usage: ${PROGNAME} init <project_slug>"
         echo
-        exit
+        graceful_exit
     fi
     project_slug="$1"
 
@@ -134,7 +119,7 @@ help_message() {
 
   Command:
 
-    set <var>=<value>   - Initialize a configuration variable
+    set <var>=<value>   - Initialize a defaults variable
     init <project_slug> - Initialize a new WPLib-based WordPress website project
 
   Options:
@@ -161,7 +146,8 @@ do
     set)
       action="set"
       shift
-      pair=(${1//=/ })
+      defaults_var=$(expr "$1" : '\(.*\)=')
+      defaults_value="${1#*=}"
       ;;
     init)
       action="init"
@@ -178,7 +164,7 @@ done
 # Main logic
 case "${action}" in
     set)
-        set_config_var "${pair[0]}" "${pair[1]}"
+        set_defaults_var "${defaults_var}" "${defaults_value}"
         ;;
 
     init)

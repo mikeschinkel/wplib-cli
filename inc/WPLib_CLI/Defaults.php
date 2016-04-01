@@ -5,25 +5,24 @@
 namespace WPLib_CLI;
 
 /**
- * Class Config
+ * Class Defaults
  * @package WPLib_CLI
  */
-class Config
+class Defaults
 {
-    const CONFIG_DIR = '~/.wplib';
-    const CONFIG_FILE = '~/.wplib/config.json';
+    const DEFAULTS_DIR = '~/.wplib';
+    const DEFAULTS_FILE = '~/.wplib/defaults.json';
 
-    public $organization = '';
-    public $description = '';
-    public $project_name = '';
-    public $project_prefix = '';
-    public $project_slug = '';
-    public $app_slug = '';
+    public $repo_org= '';
+    public $author_name = '';
+    public $author_email = '';
+    public $author_homepage = '';
+    public $author_role = '';
     public $license = 'GPL-2.0+';
 
     function __construct()
     {
-        if ( ! is_dir( $dir = $this->filepath( self::CONFIG_DIR ) ) ) {
+        if ( ! is_dir( $dir = $this->filepath( self::DEFAULTS_DIR ) ) ) {
             mkdir( $dir );
         }
     }
@@ -49,11 +48,10 @@ class Config
             }
         );
 
-        echo "\nWPLib Config:\n";
-        echo str_repeat( '-', 40 ) ."\n";
+        echo "\n\tWPLib Defaults:\n";
+        echo "\t" . str_repeat( '-', 40 ) ."\n";
         foreach ( $properties as $name => $value ) {
-            echo str_pad( "${name}:", 2+$pad_width );
-            echo "{$value}\n";
+            echo "\t" . str_pad( "${name}:", 3+$pad_width ) . "{$value}\n";
         }
         echo "\n";
     }
@@ -61,7 +59,7 @@ class Config
     function save()
     {
         $json = json_encode( (array)$this );
-        file_put_contents( $this->filepath(self::CONFIG_FILE), $json );
+        file_put_contents( $this->filepath(self::DEFAULTS_FILE), $json );
     }
 
     function filepath($dir)
@@ -72,11 +70,11 @@ class Config
 
     function load_json()
     {
-        $filepath = $this->filepath(self::CONFIG_FILE);
-        $config = is_file($filepath)
+        $filepath = $this->filepath(self::DEFAULTS_FILE);
+        $defaults = is_file($filepath)
             ? file_get_contents($filepath)
             : '{}';
-        $json = json_decode($config ? $config : '{}');
+        $json = json_decode($defaults ? $defaults : '{}');
         return $json;
     }
 
