@@ -18,6 +18,12 @@ class Defaults
     public $author_email = '';
     public $author_homepage = '';
     public $author_role = '';
+    public $versions = array(
+        'wordpress' => '*',
+        'wplib' => '*',
+        'query-monitor' => '*',
+        'helpful-information' => '*',
+    );
     public $license = 'GPL-2.0+';
 
     function __construct()

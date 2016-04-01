@@ -34,10 +34,10 @@ $json=<<<JSON
     ],
     "require": {
         "composer/installers": "dev-master",
-        "wplib/wplib": "0.12.2",
-        "wplib/wordpress": "4.4",
-        "wpackagist-plugin/query-monitor": "2.8.1",
-        "wpackagist-plugin/helpful-information": "1.0.2"
+        "wplib/wplib": "{$project->versions['wplib']}",
+        "wplib/wordpress": "{$project->versions['wordpress']}",
+        "wpackagist-plugin/query-monitor": "{$project->versions['query-monitor']}"
+        "wpackagist-plugin/helpful-information": "{$project->versions['helpful-information']}"
     },
     "extra": {
         "wplib" : {
