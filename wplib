@@ -21,14 +21,74 @@
 # 2016-03-28 Created by generate-script ver. 3.3
 # ---------------------------------------------------------------------------
 
+script_dir=$(dirname "$BASH_SOURCE")
+php_bin=$(which php)
+
 PROGNAME=${0##*/}
 VERSION="0.1"
 
+project_slug=""
+app_slug=""
+
+set_config_var() {
+    if [ "" == "$1" ]; then
+        echo
+        echo "No config var specified."
+        echo
+        echo "   Usage: ${PROGNAME} set <config_var>=<config_value>"
+        echo
+        exit
+    fi
+    config_var="$1"
+
+    if [ "" == "$2" ]; then
+        echo
+        echo "No config value specified."
+        echo
+        echo "   Usage: ${PROGNAME} set <config_var>=<config_value>"
+        echo
+        exit
+    fi
+    config_value="$2"
+
+    $php_bin "${script_dir}/inc/set-config-var.php" "${config_var}" "${config_value}"
+
+}
 init_project() {  #Initializing WPLib-based WordPress website project
 
-  mkdir -p www
-  mkdir -p docs
-  mkdir -p sql
+    if [ "" == "$1" ]; then
+        echo
+        echo "No project name specified."
+        echo
+        echo "   Usage: ${PROGNAME} init <project_slug>"
+        echo
+        exit
+    fi
+    project_slug="$1"
+
+    if [ "" == "$2" ]; then
+        app_slug="${project_slug}"
+    else
+        app_slug="$2"
+    fi
+
+    echo
+    echo "Initializing [${project_slug}] project..."
+
+    mkdir -p "${project_slug}/composer"
+    mkdir -p "${project_slug}/composer/scripts"
+    cp "${script_dir}/files/sanitize-wp.php" "${project_slug}/composer/scripts"
+
+    mkdir -p "${project_slug}/www"
+    mkdir -p "${project_slug}/www/content"
+    mkdir -p "${project_slug}/www/content/mu-plugins"
+    mkdir -p "${project_slug}/www/content/mu-plugins/${app_slug}"
+    mkdir -p "${project_slug}/www/wp"
+    mkdir -p "${project_slug}/docs"
+    mkdir -p "${project_slug}/sql"
+
+    echo
+    echo "Done."
 
 
 }
@@ -74,13 +134,13 @@ help_message() {
 
   Command:
 
-    init - Initialize a new WPLib-based WordPress website project
+    set <var>=<value>   - Initialize a configuration variable
+    init <project_slug> - Initialize a new WPLib-based WordPress website project
 
   Options:
 
     -h, --help  Display this help message and exit.
-    -a, --add-thing foo  Add
-      Where 'foo' is the Description of Foo.
+    -a, --app=<app_slug> Explicitly specify the app slug.
 
 _EOF_
   return
@@ -91,33 +151,49 @@ trap "signal_exit TERM" TERM HUP
 trap "signal_exit INT"  INT
 
 
-
-# Parse command-line
-while [[ -n $1 ]]; do
-  case $1 in
+for arg in "$@"
+do
+  case "${arg}" in
     -h | --help)
-      help_message; graceful_exit 
+      help_message
+      graceful_exit
       ;;
-
-    -a | --add-thing)
-      echo "Add"; shift; foo="$1" 
+    set)
+      action="set"
+      shift
+      pair=(${1//=/ })
       ;;
-
     init)
-      echo "Initializing WPLib-based WordPress website project." 
-      init_project
+      action="init"
+      shift
+      project_slug="$1"
       ;;
-
-    -* | --*)
-      usage
-      error_exit "Unknown option $1" ;;
-    *)
-      echo "Argument $1 to process..." ;;
+    -a=*| --app-name=*)
+      app_slug="${arg#*=}"
+      ;;
   esac
   shift
 done
 
 # Main logic
+case "${action}" in
+    set)
+        set_config_var "${pair[0]}" "${pair[1]}"
+        ;;
+
+    init)
+        init_project "${project_slug}" "${app_slug}"
+        ;;
+
+    -* | --*)
+      usage
+      error_exit "Unknown option $1" ;;
+
+    *)
+      echo "Argument $1 to process..." ;;
+
+esac
+
 
 graceful_exit
 
